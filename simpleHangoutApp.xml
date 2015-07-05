@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Module>
+<!-- Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *	
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License
+-->
+	<ModulePrefs title="Hangout Starter">
+		<Require feature="rpc" />
+		<Require feature="views" />
+		<Require feature="locked-domain" />
+	</ModulePrefs>
+	<Content type="html"><![CDATA[ 
+
+<html>
+<style type="text/css">
+<!--
+.button {
+  border-radius: 3px;
+  -moz-border-radius: 3px;
+  background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#ddd));
+  background: -moz-linear-gradient(top, #fff, #ddd);  
+  border: 1px solid #bbb;
+}
+
+.button:active {
+  background: -webkit-gradient(linear, left top, left bottom, from(#aaa), to(#333)); 
+  background: -moz-linear-gradient(bottom, #ddd, #aaa); }
+
+-->
+</style>
+<body>
+
+<script src="//plus.google.com/hangouts/_/api/v1/hangout.js"></script>
+
+<h3>Participate App 1.1</h3>
+
+
+
+<p id="test"></p>
+<p id="demo"></p>
+<p id="body"></p>
+
+<script>
+
+
+var participants = [ ]
+var participantVolumesObj = { }
+
+
+
+var myVar = setInterval(function(){ myTimer() }, 1000);
+
+var totalVolume = 0
+
+
+function myTimer() {
+
+    var allVolume = gapi.hangout.av.getVolumes();
+    for (var volume in allVolume) {
+    totalVolume += allVolume[volume];
+    }
+
+
+
+    document.getElementById("demo").innerHTML = 'Total Talking: ' + totalVolume ;
+
+    participants = gapi.hangout.getParticipants();
+    var volList = '<p>Participants: Amount Talked</p><ul>';
+
+    for (var index in participants) {
+    var participant = participants[index];
+    partid = participant.id;
+    thisVolume = gapi.hangout.av.getParticipantVolume(partid);
+
+    participantVolumesObj[partid] =  (participantVolumesObj[partid] || 0) + thisVolume;
+
+    volList += '<li>' + participant.person.displayName + ": " + participantVolumesObj[partid] + ' ('+ (participantVolumesObj[partid]/totalVolume*100).toFixed(1) + "%" + ')'+'</li>';
+
+
+    }
+    volList += '</ul>';
+
+    document.getElementById("body").innerHTML = volList;
+
+
+}
+
+
+
+function init() {
+  // When API is ready...                                                         
+  gapi.hangout.onApiReady.add(
+      function(eventObj) {
+        if (eventObj.isApiReady) {
+          document.getElementById('showVolumes')
+            .style.visibility = 'visible';
+        }
+      });
+}
+
+// Wait for gadget to load.                                                       
+gadgets.util.registerOnLoadHandler(init);
+
+</script>
+
+
+
+</body>
+
+]]>
+</Content>
+</Module>
+
